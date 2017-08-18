@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="css/my.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+	<div class="container-fluid">
+
+		<div class="container" id="main-title">
+			<h1>
+				<strong><u>To-Do List</u></strong>
+			</h1>
+		</div>
+
+		<div class="bg-primary">
+			<form action="/task/POST" method="post" class="form-inline">
+				<input type="text" name="task-name" class="form-control"
+					placeholder="Task" /> <input type="text" name="first-name"
+					class="form-control" placeholder="First Name" /> <input
+					type="text" name="last-name" class="form-control"
+					placeholder="Last Name" />
+				<button type="submit" class="btn btn-primary"
+					onclick="update(event)">
+					<i class="icon-user icon-white"></i><span
+						class="glyphicon glyphicon-plus"></span>
+				</button>
+			</form>
+		</div>
+
+		<ul class="list-unstyled"></ul>
+
+		<!-- import jQuery library -->
+		<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script th:inline="javascript">
+			/*<![CDATA[*/
+			function get() {
+				$.ajax({
+					type : "GET",
+					url : "/task/GET",
+					success : getCallback
+				});
+			}
+
+			function update(event) {
+				event.preventDefault();
+				$.ajax({
+					type : "POST",
+					url : "/task/POST",
+					success : postCallback,
+					data : $("form").serialize()
+				});
+			}
+
+			function getCallback(data) {
+				var json = data;
+				$(".list-unstyled").html("");
+
+				for (var i = 0; i < json.length; i++) {
+					$(".list-unstyled")
+							.append(
+									"<li><a onclick='del(this)' href='#' id='"
+											+ json[i].id
+											+ "'><i class='icon-user icon-white'></i><span class='glyphicon glyphicon-trash'></span></a>Task #"
+											+ json[i].id + " - "
+											+ json[i].taskName + " - "
+											+ json[i].lastName + ", "
+											+ json[i].firstName + "</li>");
+				}
+			}
+
+			function postCallback(data) {
+				get();
+			}
+
+			function del(data) {
+				// Fetch id of task to delete through url
+				var url = "/task/DEL?id=" + data.id;
+				alert(url);
+				$.ajax({
+					type : "DELETE",
+					url : url,
+					success : delCallback
+				});
+				event.preventDefault();
+			}
+
+			function delCallback(data) {
+				get();
+			}
+
+			get();
+			/*]]>*/
+		</script>
+	</div>
+</body>
+</html>
